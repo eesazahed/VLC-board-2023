@@ -1,9 +1,10 @@
 let selectedX;
 let selectedY;
 let pixelArray, interval;
+
 const coordElement = document.getElementById("pixel");
+const userPlacedElement = document.getElementById("userPlacedElement");
 const placeButton = document.getElementById("placePixel");
-const ownerElement = document.getElementById("owner");
 const chatInput = document.getElementById("chatInput");
 const messages = document.getElementById("messages");
 
@@ -194,9 +195,27 @@ socket.on("canvasUpdate", function (event) {
 });
 
 socket.on("chat", function (msg) {
-  const newMsg = document.createElement("p");
-  messages.appendChild(newMsg);
-  newMsg.innerHTML = msg;
+  if (msg) {
+    const msgContent = JSON.parse(msg);
+
+    const sender = `@${msgContent.sender}`;
+    const textContent = msgContent.textContent;
+
+    const newMsg = document.createElement("p");
+    newMsg.className = sender;
+
+    let msgInnerHTML = `<span>&nbsp;</span><br/><p style="margin-bottom: 3px"><b>${sender}</b></p><span>${textContent}</span>`;
+
+    if (messages.childElementCount > 0) {
+      if (messages.firstElementChild.className === sender) {
+        msgInnerHTML = `<span>${textContent}</span>`;
+      }
+    }
+
+    newMsg.innerHTML = msgInnerHTML;
+
+    messages.prepend(newMsg);
+  }
 });
 
 function handle(e) {
@@ -214,7 +233,7 @@ function placePixel(event) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      token: id_token,
+      token: authToken,
       selectedX: selectedX,
       selectedY: selectedY,
       selectedColor: selectedColor,
@@ -266,3 +285,16 @@ function generateCountdown(element, timestamp) {
     }
   }, 1000);
 }
+
+chatInput.addEventListener("keypress", function (event) {
+  if (event.key === "Enter") {
+    const message = {
+      textContent: this.value,
+      token: authToken,
+    };
+
+    socket.emit("chat", JSON.stringify(message));
+
+    this.value = "";
+  }
+});

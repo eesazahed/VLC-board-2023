@@ -1,3 +1,4 @@
+const main = document.getElementById("main");
 const zoomElement = document.getElementById("zoom-container");
 const board = document.getElementById("board");
 
@@ -129,10 +130,13 @@ function crosshairBorderRender(selectedNextX, selectedNextY) {
 
 function renderPixelOwner(pixel) {
   if (pixel == "open") {
-    ownerElement.innerHTML = "";
+    userPlacedElement.innerHTML = "";
     return;
   }
-  console.log(pixel);
+
+  const displayInnerHTML = (username) =>
+    `<div style="padding: 0.5rem;">@${username}</div>`;
+
   let pixelOwner = pixel.u;
   if (!cachedUsers[pixelOwner]) {
     fetch("/user", {
@@ -146,13 +150,15 @@ function renderPixelOwner(pixel) {
     }).then((response) => {
       response.json().then((json) => {
         cachedUsers[pixelOwner] = json;
-        ownerElement.innerHTML = `<img src="${cachedUsers[pixelOwner].picture}" alt="${cachedUsers[pixelOwner].name}">
-  <h5 class="name">${cachedUsers[pixelOwner].name}</h5>`;
+        userPlacedElement.innerHTML = displayInnerHTML(
+          cachedUsers[pixelOwner].username
+        );
       });
     });
   } else {
-    ownerElement.innerHTML = `<img src="${cachedUsers[pixelOwner].picture}" alt="${cachedUsers[pixelOwner].name}">
-  <h5 class="name">${cachedUsers[pixelOwner].name}</h5>`;
+    userPlacedElement.innerHTML = displayInnerHTML(
+      cachedUsers[pixelOwner].username
+    );
   }
 }
 
@@ -187,15 +193,15 @@ function pixelInfo(x, y) {
   }
 }
 
-document.addEventListener("wheel", zoom_camera);
+main.addEventListener("wheel", zoom_camera);
 
-document.addEventListener("touchstart", dragStart);
-document.addEventListener("touchend", dragEnd);
-document.addEventListener("touchmove", drag);
+main.addEventListener("touchstart", dragStart);
+main.addEventListener("touchend", dragEnd);
+main.addEventListener("touchmove", drag);
 
-document.addEventListener("mousedown", dragStart);
-document.addEventListener("mouseup", dragEnd);
-document.addEventListener("mousemove", drag);
+main.addEventListener("mousedown", dragStart);
+main.addEventListener("mouseup", dragEnd);
+main.addEventListener("mousemove", drag);
 
 let pointerdown = false;
 

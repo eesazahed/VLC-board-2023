@@ -21,12 +21,8 @@ const io = new Server(server);
 // JWT
 const jwt = require("jsonwebtoken");
 
-// Gapi
-const { OAuth2Client } = require("google-auth-library");
-const googleClient = new OAuth2Client(process.env["GOOGLE_SECRET"]);
-
 // MongoDB
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const client = new MongoClient(process.env["MONGO_URI"], {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -40,8 +36,6 @@ const client2 = new MongoClient(process.env["MONGO_URI2"], {
 
 let pixelArray, boardCollection;
 const usersCollection = client.db("main").collection("users");
-
-// how do I RESET THIS?
 const placedCollection = client2.db("main").collection("placed");
 
 const allowedUsers = [];
@@ -113,20 +107,19 @@ app.post("/", async (req, res) => {
     return res.status(405).send(err);
   }
 
+  if (!user) return res.status(405).send("Please create an account.");
+
   let cooldown;
 
-  if (user) {
-    cooldown = user.cooldown;
-  } else {
-    console.log("fix this later");
+  if (!user.cooldown) {
     cooldown = Date.now();
-    usersCollection.insertOne({
-      _id: userPayload.sub,
-      name: userPayload.name,
-      cooldown: cooldown,
-      picture: userPayload.picture,
-      ip: req.header("x-forwarded-for"),
-    });
+
+    await usersCollection.updateOne(
+      { username: user.username },
+      { $set: { cooldown } }
+    );
+  } else {
+    cooldown = user.cooldown;
   }
 
   res.send({ cooldown: cooldown });
@@ -182,11 +175,12 @@ app.post("/placepixel", async (req, res) => {
     const cooldown = allowedUsers.includes(user.username)
       ? 10
       : Date.now() + 8000;
+
     res.send({ cooldown: cooldown });
 
     await usersCollection.updateOne(
-      { _id: user._id },
-      { $set: { cooldown: cooldown } }
+      { username: user.username },
+      { $set: { cooldown } }
     );
 
     let _id = `${req.body.selectedX}${req.body.selectedY}`;
@@ -212,7 +206,7 @@ app.get("/about", (req, res) => {
 });
 
 app.post("/user", async (req, res) => {
-  const user = await usersCollection.findOne({ _id: req.body.id });
+  const user = await usersCollection.findOne({ _id: ObjectId(req.body.id) });
   if (user) {
     res.json({ username: user.username });
   } else {
@@ -245,6 +239,36 @@ const sendPixelArray = (socket) => {
 };
 
 io.on("connection", sendPixelArray);
+
+io.on("connection", (socket) => {
+  socket.on("chat", async (msg) => {
+    if (msg) {
+      const msgContent = JSON.parse(msg);
+
+      const token = msgContent.token;
+      const textContent = msgContent.textContent;
+
+      let username = null;
+
+      try {
+        if (!token) return null;
+        const verified = verifyjwt(token);
+        if (!verified) return null;
+        user = await usersCollection.findOne({
+          username: verified.username,
+        });
+        if (!user) return null;
+        username = user.username;
+      } catch (err) {
+        return res.status(405).send(err);
+      }
+
+      if (username && textContent.trim().length > 0) {
+        io.emit("chat", JSON.stringify({ sender: username, textContent }));
+      }
+    }
+  });
+});
 
 setInterval(() => {
   if (pixelArray) {

@@ -1,3 +1,7 @@
+// Load .env
+const dotenv = require("dotenv");
+dotenv.config();
+
 // MongoDB
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const client = new MongoClient(process.env["MONGO_URI"], {
@@ -20,7 +24,7 @@ client.connect(async (err) => {
   const usersCollection = client.db("board").collection("users");
   boardCollection = client.db("board").collection("pixels");
 
-  await usersCollection.deleteMany({});
+  // await usersCollection.deleteMany({});
   await boardCollection.updateOne(
     { _id: "latestBoard" },
     {
@@ -46,3 +50,5 @@ client2.connect(async (err) => {
 
   client2.close();
 });
+
+console.log("complete");
