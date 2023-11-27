@@ -82,7 +82,7 @@ const showPlaceButton = () => {
 
 const renderCrosshair = (selectedX, selectedY) => {
   coordElement.classList.add("show");
-  coordElement.innerHTML = `${selectedX + 1}, ${selectedY + 1}`;
+  coordElement.innerHTML = `(${selectedX + 1}, ${selectedY + 1})`;
 
   const x = selectedX * 10;
   const y = selectedY * 10;
@@ -220,7 +220,7 @@ socket.on("chat", (msg) => {
 
     newMsg.innerHTML = msgInnerHTML;
     messages.prepend(newMsg);
-    document.getElementById(`${msgId}`).innerText = textContent; // to prevent HTML tag injections
+    document.getElementById(`${msgId}`).innerText = textContent; // to prevent HTML tags
   }
 });
 
@@ -430,7 +430,7 @@ const crosshairBorderRender = (selectedNextX, selectedNextY) => {
 
 const renderPixelOwner = (pixel) => {
   if (pixel === "open") {
-    ownerElement.innerHTML = "<p>&nbsp;</p>";
+    ownerElement.innerHTML = "";
     return;
   }
 
