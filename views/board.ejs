@@ -41,7 +41,7 @@
         <h1>VLC Board</h1>
         <img src="/img/board.png" alt="VLC Board Logo" />
       </div>
-      <div id="owner"><p>&nbsp;</p></div>
+      <!-- <div id="owner"><p>&nbsp;</p></div> -->
       <div id="chat-container">
         <p id="chatTitle"><b>Chat</b></p>
         <div id="chat">
@@ -88,18 +88,11 @@
       </div>
 
       <div class="center">
-        <p id="placePixel" onclick="placePixel(event)">
+        <div id="owner"></div>
+
+        <p id="placePixel" onclick="placePixel(event)" class="enabled">
           <i class="fa-sharp fa-solid fa-check"></i>
         </p>
-      </div>
-      <div id="error-box">
-        <div class="error-content">
-          <div class="error-top">
-            <h1>:(</h1>
-          </div>
-          <p id="error">Error Text</p>
-          <button class="close" onclick="closeErrorBox()">Okay!</button>
-        </div>
       </div>
     </div>
 
