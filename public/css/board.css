@@ -144,10 +144,7 @@ canvas {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-}
-
-#placePixel.show {
-	bottom: 10;
+  visibility: hidden;
 }
 
 #placePixel.enabled {
@@ -221,6 +218,21 @@ canvas {
 	color: white;
 	font-weight: 700;
 	font-size: 17px;
+}
+
+#loginlink a {
+  font-size: 1rem;
+  background: #0070f3;
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1.25rem 0.75rem 1.25rem;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: 0.5s;
+}
+
+#loginlink a:hover {
+  background: #0058bd;
 }
 
 /* chat */

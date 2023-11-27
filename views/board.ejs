@@ -2,18 +2,6 @@
   <head>
     <title>VLC Board</title>
 
-    <!-- Favicon -->
-    <!-- <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="favicon/apple-touch-icon.png"
-    />
-    <link
-      rel="icon"
-      type="image/png"
-      sizes="32x32"
-      href="favicon/favicon-32x32.png"
-    /> -->
     <link
       rel="icon"
       type="image/png"
@@ -37,59 +25,8 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
     />
-
-    <!-- Load Libraries -->
-    <!-- <script src="js/login.js"></script> -->
-
-		<script>
-
-			const authToken = document.cookie.split("token=").pop().split(";")[0];
-			let url = window.location.href;
-
-			if (authToken) {
-				if (url.includes("?token=")) {
-					window.location.href = url.split("?token=")[0];
-				}
-
-				fetch(url, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						token: authToken,
-					}),
-				}).then((response) => {
-					if (response.status == 200) {
-						if (url.includes("?token=")) {
-							url = url.split("?token=")[0];
-						}
-
-						response.json().then((json) => {
-							generateCountdown(placeButton, json.cooldown);
-						});
-					} else {
-						response.text().then((text) => {
-							displayErrorMessage(text);
-						});
-					}
-				});
-			} else {
-				if (url.includes("?token=")) {
-					const queryString = url.split("?").pop();
-
-					const token = queryString.split("token=").pop();
-
-					if (token) {
-						document.cookie = `token=${token};max-age=31536000`;
-						console.log("logged in")
-						window.location.reload();
-					}
-				}
-			}
-
-			
-		</script>
+    
+    <script src="js/login.js"></script>
 
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -134,7 +71,7 @@
       </div>
 
       <div class="center">
-        <p id="placePixel" onclick="placePixel(event)" style="visibility: hidden;">
+        <p id="placePixel" onclick="placePixel(event)">
           <i class="fa-sharp fa-solid fa-check"></i>
         </p>
       </div>
@@ -149,27 +86,6 @@
       </div>
     </div>
 
-    <script src="js/board/index.js"></script>
-    <script src="js/board/camera.js"></script>
-    <script src="js/error.js"></script>
-
-    <script>
-      if (authToken) {
-        document.getElementById("loginlink").remove();
-				document.getElementById("placePixel").style.visibility = "visible";
-        const colorElement = document.getElementById("colors");
-        colorElement.innerHTML = "";
-
-        for (const color of Object.keys(colors)) {
-          colorElement.innerHTML += `<input ${
-            color == selectedColor ? 'checked=""' : ""
-          } onchange="updateColor(event);" type="radio" name="color" style="background-color: ${
-            colors[color]
-          };" color="${color}"></div>`;
-        }
-      } else {
-				document.getElementById("chat-container").remove();
-      }
-    </script>
+    <script src="js/script.js"></script>
   </body>
 </html>

@@ -1,5 +1,5 @@
 const { exec } = require("child_process");
- 
+
 // Load .env
 const dotenv = require("dotenv");
 dotenv.config();
@@ -38,7 +38,7 @@ let pixelArray, boardCollection;
 const usersCollection = client.db("main").collection("users");
 const placedCollection = client2.db("main").collection("placed");
 
-const allowedUsers = [];
+const allowedUsers = ["eesa.zahed"];
 
 client.connect(async (err) => {
   if (err) {
@@ -92,22 +92,22 @@ app.post("/", async (req, res) => {
   let user = null;
 
   try {
-    if (!token) return res.status(405).send("Unauthorized.");
+    if (!token) return res.status(401).send("Unauthorized.");
 
     const verified = verifyjwt(token);
-    if (!verified) return res.status(405).send("Unauthorized.");
+    if (!verified) return res.status(401).send("Unauthorized.");
 
     user = await usersCollection.findOne({
       username: verified.username,
     });
-    if (!user) return res.status(405).send("Unauthorized.");
+    if (!user) return res.status(401).send("Unauthorized.");
 
     user = { ...user, _id: user._id.toString() };
   } catch (err) {
-    return res.status(405).send(err);
+    return res.status(400).send(err);
   }
 
-  if (!user) return res.status(405).send("Please create an account.");
+  if (!user) return res.status(401).send("Please create an account.");
 
   let cooldown;
 
@@ -128,6 +128,14 @@ app.post("/", async (req, res) => {
 app.post("/placepixel", async (req, res) => {
   let token = req.body.token;
   let user = null;
+
+  if (!(req.body.selectedX >= 0 && !!req.body.selectedY >= 0)) {
+    return res.status(400).send("Please select a pixel.");
+  }
+
+  if (!req.body.selectedColor) {
+    return res.status(400).send("Please select a colour.");
+  }
 
   try {
     if (!token) return res.status(405).send("Unauthorized.");
@@ -210,7 +218,7 @@ app.post("/user", async (req, res) => {
   if (user) {
     res.json({ username: user.username });
   } else {
-    res.json({});
+    res.json(null);
   }
 });
 
@@ -220,7 +228,7 @@ app.post("/pixel", async (req, res) => {
   });
 
   if (!pixel) {
-    return res.sendStatus(404);
+    return res.json(null);
   }
 
   res.json(pixel.p[pixel.p.length - 1]);
@@ -263,10 +271,13 @@ io.on("connection", (socket) => {
         return res.status(405).send(err);
       }
 
-			const swearWords = ["fuck", "shit", "ass", "bitch", "dick", "pussy", "nigger", "nigga"];
+      const swearWords = ["fuck", "shit", "bastard", "ass", "bitch", "dick", "pussy", "nigger", "nigga", "penis", "sex", "retard", "sh1t", "fxck", "fvck"];
 
-		// todo: filter bad words
-			
+      swearWords.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\S*\\b`, "gi");
+        textContent = textContent.replace(regex, "█");
+      });
+
       if (username && textContent.trim().length > 0) {
         io.emit("chat", JSON.stringify({ sender: username, textContent }));
       }

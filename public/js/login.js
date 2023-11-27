@@ -2,10 +2,10 @@ const authToken = document.cookie.split("token=").pop().split(";")[0];
 let url = window.location.href;
 
 if (authToken) {
-	if (url.includes("?token=")) {
-		window.location.href = url.split("?token=")[0];
-	}
-	
+  if (url.includes("?token=")) {
+    window.location.href = url.split("?token=")[0];
+  }
+
   fetch(url, {
     method: "POST",
     headers: {
@@ -15,17 +15,14 @@ if (authToken) {
       token: authToken,
     }),
   }).then((response) => {
-    if (response.status == 200) {
+    if (response.status === 200) {
       if (url.includes("?token=")) {
-        url = url.split("?")[0];
+        url = url.split("?token=")[0];
       }
-
-      response.json().then((json) => {
-        generateCountdown(placeButton, json.cooldown);
-      });
     } else {
       response.text().then((text) => {
-        displayErrorMessage(text);
+        document.cookie = `token=null;max-age=0`;
+        window.location.reload();
       });
     }
   });
@@ -37,7 +34,8 @@ if (authToken) {
 
     if (token) {
       document.cookie = `token=${token};max-age=31536000`;
-      url = url.split("?")[0];
+      window.location.reload();
     }
   }
 }
+
