@@ -202,7 +202,7 @@ socket.on("chat", (msg) => {
   if (msg) {
     const msgContent = JSON.parse(msg);
 
-    const sender = msgContent.sender;
+    const sender = `@${msgContent.sender}`;
     const textContent = msgContent.textContent;
 
     const newMsg = document.createElement("p");
@@ -434,7 +434,7 @@ const renderPixelOwner = (pixel) => {
     return;
   }
 
-  const displayInnerHTML = (username) => `<p>${username}</p>`;
+  const displayInnerHTML = (username) => `<p title="Pixel was placed by @${username}." class="ownerUsername">@${username}</p>`;
 
   let pixelOwner = pixel.u;
   if (!cachedUsers[pixelOwner]) {
@@ -547,6 +547,7 @@ board.onpointerup = (e) => {
 
 if (authToken) {
   document.getElementById("loginlink").remove();
+  document.getElementById("chat-container").style.visibility = "visible";
   const colorElement = document.getElementById("colors");
   colorElement.innerHTML = "";
 
@@ -555,6 +556,4 @@ if (authToken) {
       } onchange="updateColor(event);" type="radio" name="color" style="background-color: ${colors[color]
       };" color="${color}"></div>`;
   }
-} else {
-  document.getElementById("chat-container").remove();
 }
