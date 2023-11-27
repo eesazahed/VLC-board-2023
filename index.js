@@ -256,6 +256,10 @@ io.on("connection", (socket) => {
       const token = msgContent.token;
       let textContent = msgContent.textContent;
 
+      if (!textContent) {
+        return null;
+      }
+
       let username = null;
 
       try {
@@ -268,7 +272,7 @@ io.on("connection", (socket) => {
         if (!user) return null;
         username = user.username;
       } catch (err) {
-        return res.status(405).send(err);
+        return null
       }
 
       const swearWords = ["fuck", "shit", "bastard", "ass", "bitch", "dick", "pussy", "nigger", "nigga", "penis", "sex", "retard", "sh1t", "fxck", "fvck"];
