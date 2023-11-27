@@ -34,11 +34,37 @@ const client2 = new MongoClient(process.env["MONGO_URI2"], {
   serverApi: ServerApiVersion.v1,
 });
 
-let pixelArray, boardCollection;
+let pixelArray;
+
 const usersCollection = client.db("main").collection("users");
 const placedCollection = client2.db("main").collection("placed");
 
 const allowedUsers = []; // temporary list of allowed users
+
+//file
+const fs = require("fs");
+const file = fs.readFileSync("board.txt").toString().split("\n");
+
+let board = [];
+
+for (let line of file) {
+  const pixels = line.split(",").map((x) => parseInt(x));
+  board.push(pixels);
+}
+
+const getBoard = () => board;
+
+const getPixel = (row, column) => board[row][column];
+
+const setPixel = (row, column, value) => {
+  board[row][column] = value;
+  let boardAsTxt = board.map((line) => line.join(","));
+  boardAsTxt[row] = board[row].join(",");
+  boardAsTxt = boardAsTxt.join("\n");
+  fs.writeFileSync("board.txt", boardAsTxt, "utf-8");
+};
+//file
+
 
 client.connect(async (err) => {
   if (err) {
@@ -47,18 +73,10 @@ client.connect(async (err) => {
     process.exit(1);
   }
 
-  boardCollection = client.db("board").collection("pixels");
-
-  const board = await boardCollection.findOne({ _id: "latestBoard" });
   try {
-    pixelArray = board.pixelArray;
+    pixelArray = getBoard();
   } catch (err) {
     pixelArray = Array(50).fill(Array(50).fill(32));
-    await boardCollection.updateOne(
-      { _id: "latestBoard" },
-      { $set: { _id: "latestBoard", pixelArray } },
-      { upsert: true }
-    );
   }
 });
 
@@ -153,14 +171,14 @@ app.post("/placepixel", async (req, res) => {
   if (user) {
     cooldown = user.cooldown;
   } else {
-    return res.status(405).send("Not a registered user!");
+    return res.status(401).send("Not a registered user!");
   }
 
   if (cooldown < Date.now()) {
     try {
       pixelArray[selectedY][selectedX] = parseInt(selectedColor, 10);
     } catch (err) {
-      return res.sendStatus(403);
+      return res.sendStatus(400);
     }
 
     io.emit("pixelUpdate", {
@@ -280,7 +298,9 @@ io.on("connection", (socket) => {
 
 setInterval(() => {
   if (pixelArray) {
-    boardCollection.updateOne({ _id: "latestBoard" }, { $set: { pixelArray } });
+    let boardAsTxt = board.map((line) => line.join(","));
+    boardAsTxt = boardAsTxt.join("\n");
+    fs.writeFileSync("board.txt", boardAsTxt, "utf-8");
   }
 }, 5000);
 

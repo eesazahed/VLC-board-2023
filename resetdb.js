@@ -21,7 +21,7 @@ client.connect(async (err) => {
     process.exit(1);
   }
 
-  const usersCollection = client.db("board").collection("users");
+  // const usersCollection = client.db("board").collection("users");
   boardCollection = client.db("board").collection("pixels");
 
   // await usersCollection.deleteMany({});

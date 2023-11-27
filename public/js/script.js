@@ -248,17 +248,17 @@ const placePixel = (event) => {
 
 const generateCountdown = (element, timestamp) => {
   const enableTime = new Date(timestamp);
-  if (interval) {
-    clearInterval(interval);
-  }
+
+  if (interval) clearInterval(interval);
+
   const timeRemaining = Math.ceil(
     (enableTime.getTime() - new Date().getTime()) / 100
   );
-  if (1 > timeRemaining) {
-    return;
-  }
+
+  if (1 > timeRemaining) return
 
   element.classList.remove("enabled");
+  element.innerHTML = "0:09";
   placeButton.disabled = true;
 
   interval = setInterval(() => {
@@ -271,6 +271,7 @@ const generateCountdown = (element, timestamp) => {
 
     element.innerHTML = `${minute.length === 1 ? "0" : ""}${minute}:${second.length === 1 ? "0" : ""
       }${second}`;
+
     if (1 > timeRemaining) {
       element.classList.add("enabled");
       element.innerHTML = `<i class="fa-sharp fa-solid fa-check"></i>`;
@@ -434,7 +435,7 @@ const renderPixelOwner = (pixel) => {
     return;
   }
 
-  const displayInnerHTML = (username) => `<p title="Pixel was placed by @${username}." class="ownerUsername">@${username}</p>`;
+  const displayInnerHTML = (username) => `<p title="Pixel was placed by @${username}" class="ownerUsername">@${username}</p>`;
 
   let pixelOwner = pixel.u;
   if (!cachedUsers[pixelOwner]) {
