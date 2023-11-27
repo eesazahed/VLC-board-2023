@@ -38,7 +38,7 @@ let pixelArray, boardCollection;
 const usersCollection = client.db("main").collection("users");
 const placedCollection = client2.db("main").collection("placed");
 
-const allowedUsers = ["eesa.zahed"];
+const allowedUsers = []; // temporary list of allowed users
 
 client.connect(async (err) => {
   if (err) {
@@ -93,15 +93,10 @@ app.post("/", async (req, res) => {
 
   try {
     if (!token) return res.status(401).send("Unauthorized.");
-
     const verified = verifyjwt(token);
     if (!verified) return res.status(401).send("Unauthorized.");
-
-    user = await usersCollection.findOne({
-      username: verified.username,
-    });
+    user = await usersCollection.findOne({ username: verified.username });
     if (!user) return res.status(401).send("Unauthorized.");
-
     user = { ...user, _id: user._id.toString() };
   } catch (err) {
     return res.status(400).send(err);
@@ -127,31 +122,30 @@ app.post("/", async (req, res) => {
 
 app.post("/placepixel", async (req, res) => {
   let token = req.body.token;
-  let user = null;
 
-  if (!(req.body.selectedX >= 0 && !!req.body.selectedY >= 0)) {
-    return res.status(400).send("Please select a pixel.");
+  let selectedX = req.body.selectedX;
+  let selectedY = req.body.selectedY;
+  let selectedColor = req.body.selectedColor;
+
+  if ((selectedX > 49) || (selectedY > 49) || (selectedX < 0) || (selectedY < 0)) {
+    return res.status(400).send("Please place a pixel on the grid.");
   }
 
-  if (!req.body.selectedColor) {
+  if (!selectedColor) {
     return res.status(400).send("Please select a colour.");
   }
 
+  let user = null;
+
   try {
-    if (!token) return res.status(405).send("Unauthorized.");
-
+    if (!token) return res.status(401).send("Unauthorized.");
     const verified = verifyjwt(token);
-    if (!verified) return res.status(405).send("Unauthorized.");
-
-    user = await usersCollection.findOne({
-      username: verified.username,
-    });
-
-    if (!user) return res.status(405).send("Unauthorized.");
-
+    if (!verified) return res.status(401).send("Unauthorized.");
+    user = await usersCollection.findOne({ username: verified.username });
+    if (!user) return res.status(401).send("Unauthorized.");
     user = { ...user, _id: user._id.toString() };
   } catch (err) {
-    return res.status(405).send(err);
+    return res.status(400).send(err);
   }
 
   let cooldown;
@@ -164,18 +158,15 @@ app.post("/placepixel", async (req, res) => {
 
   if (cooldown < Date.now()) {
     try {
-      pixelArray[req.body.selectedY][req.body.selectedX] = parseInt(
-        req.body.selectedColor,
-        10
-      );
+      pixelArray[selectedY][selectedX] = parseInt(selectedColor, 10);
     } catch (err) {
       return res.sendStatus(403);
     }
 
     io.emit("pixelUpdate", {
-      x: req.body.selectedX,
-      y: req.body.selectedY,
-      color: req.body.selectedColor,
+      x: selectedX,
+      y: selectedY,
+      color: selectedColor,
       pixelArray: pixelArray,
       u: user._id,
     });
@@ -191,17 +182,17 @@ app.post("/placepixel", async (req, res) => {
       { $set: { cooldown } }
     );
 
-    let _id = `${req.body.selectedX}${req.body.selectedY}`;
+    let _id = `${selectedX}${selectedY}`;
     const pixel = await placedCollection.findOne({ _id });
     if (!pixel) {
       placedCollection.insertOne({
         _id,
-        p: [{ c: req.body.selectedColor, u: user._id }],
+        p: [{ c: selectedColor, u: user._id }],
       });
     } else {
       placedCollection.updateOne(
         { _id },
-        { $push: { p: { c: req.body.selectedColor, u: user._id } } }
+        { $push: { p: { c: selectedColor, u: user._id } } }
       );
     }
   } else {
@@ -266,9 +257,7 @@ io.on("connection", (socket) => {
         if (!token) return null;
         const verified = verifyjwt(token);
         if (!verified) return null;
-        user = await usersCollection.findOne({
-          username: verified.username,
-        });
+        user = await usersCollection.findOne({ username: verified.username });
         if (!user) return null;
         username = user.username;
       } catch (err) {
