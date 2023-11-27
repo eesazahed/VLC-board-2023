@@ -209,7 +209,7 @@ socket.on("chat", (msg) => {
     newMsg.className = sender;
 
     const msgId = messages.childElementCount || 0;
-    console.log(msgId);
+
     let msgInnerHTML = `<p style="margin-bottom: 3px"><b>${sender}</b></p><span id="${msgId}"></span>`;
 
     if (msgId > 0) {
@@ -223,14 +223,6 @@ socket.on("chat", (msg) => {
     document.getElementById(`${msgId}`).innerText = textContent; // to prevent HTML tag injections
   }
 });
-
-const handle = (e) => {
-  if (e.keyCode === 13) {
-    socket.emit("chat", chatInput.value);
-    chatInput.value = "";
-    return false;
-  }
-};
 
 const placePixel = (event) => {
   fetch("/placepixel", {
@@ -294,13 +286,13 @@ const generateCountdown = (element, timestamp) => {
 chatInput.addEventListener("keypress", (event) => {
   if (event.key === "Enter") {
     const message = {
-      textContent: this.value,
+      textContent: chatInput.value,
       token: authToken,
     };
 
     socket.emit("chat", JSON.stringify(message));
 
-    this.value = "";
+    chatInput.value = "";
   }
 });
 
