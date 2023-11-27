@@ -134,7 +134,7 @@ function renderPixelOwner(pixel) {
     return;
   }
 
-  const displayInnerHTML = (username) => `<p>@${username}</p>`;
+  const displayInnerHTML = (username) => `<p class="ownerUsername">@${username}</p>`;
 
   let pixelOwner = pixel.u;
   if (!cachedUsers[pixelOwner]) {
@@ -221,14 +221,14 @@ function pixelFocus(e) {
 
 let holdTimeStart;
 
-board.onpointerdown = function (e) {
+board.onpointerdown = function(e) {
   focusTimeout = setTimeout(() => {
     pixelFocus(e);
   }, 300);
   pointerdown = true;
 };
 
-board.onpointerup = function (e) {
+board.onpointerup = function(e) {
   pointerdown = false;
 
   if (focusTimeout) {

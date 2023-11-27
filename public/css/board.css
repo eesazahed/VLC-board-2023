@@ -168,6 +168,20 @@ canvas {
 	justify-content: space-evenly;
 }
 
+#owner p {
+  margin: 0;
+  font-weight: bold;
+  font-style: italic;
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.ownerUsername {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: inset 2px #000;
+}
+
 #error-box {
 	display: none;
 	position: fixed;
