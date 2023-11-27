@@ -12,17 +12,31 @@ body {
 	font-family: "Inter", sans-serif;
 }
 
+a {
+  color: #0070f3;
+  text-decoration: none;
+}
+
 .sidebar-container {
+  padding: 0rem;
+  margin: 0rem;
 	overflow-y: auto;
 	position: absolute;
 	z-index: 3;
-	background-color: #fafafa;
-	width: 250px;
+  background: #f7f7f7;
+  color: black;
+	width: 300px;
 	height: 100vh;
 }
 
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: white; }
+::-webkit-scrollbar-thumb { background: #888; }
+::-webkit-scrollbar-thumb:hover { background: grey; }
+
 .sidebar {
-  padding-top: 1.5rem;
+  padding: 0rem;
+  margin: 0rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,7 +47,7 @@ body {
 #siteInfo {
   font-size: 0.65rem;
   text-align: center;
-  padding: 1rem;
+  padding: 1.25rem;
   margin-top: 2rem;
 }
 
@@ -49,17 +63,14 @@ body {
 }
 
 .info > h1 {
-	margin: 0;
+	margin: 2rem 0rem 1rem 0rem;
+  font-size: 2.5rem;
 }
 
 .info > img {
-	height: 120px;
+	height: 100px;
 }
 
-.logo {
-	height: 50px;
-	margin-bottom: 1rem;
-}
 
 #container {
 	width: 100%;
@@ -100,7 +111,7 @@ canvas {
 	appearance: none;
 	width: 23px;
 	height: 23px;
-	border: 1px solid;
+	border: 1px solid black;
 	border-radius: 0.25rem;
 	transition: all 0.2s;
 }
@@ -181,55 +192,15 @@ canvas {
   margin: 0;
   font-weight: bold;
   font-style: italic;
-  padding: 1rem;
-  margin: 1rem;
+  padding: 0.75rem;
+  margin: 1.5rem 1rem;
 }
 
 .ownerUsername {
   background: white;
+  color: black;
   border-radius: 1rem;
-  box-shadow: inset 2px #000;
-}
-
-#error-box {
-	display: none;
-	position: fixed;
-	z-index: 1;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	overflow: auto;
-	background-color: rgba(0, 0, 0, 0.4);
-}
-
-.error-content {
-	background-color: #fefefe;
-	margin: 15% auto;
-	padding: 20px;
-	box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
-		rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-	width: 400px;
-	height: 200px;
-	display: flex;
-	justify-content: space-between;
-	flex-direction: column;
-}
-
-.error-top {
-	height: 50px;
-}
-
-.close {
-	margin-left: auto;
-	cursor: pointer;
-	border: none;
-	background-color: red;
-	width: 80px;
-	height: 40px;
-	color: white;
-	font-weight: 700;
-	font-size: 17px;
+  box-shadow: inset 0 0 0 1px black;
 }
 
 #loginlink a {
@@ -252,6 +223,7 @@ canvas {
 #chat-container {
 	display: flex;
 	flex-direction: column;
+  visibility: hidden;
 }
 
 #chatTitle {
@@ -264,7 +236,7 @@ canvas {
 	border: 1px solid black;
 	border-radius: 1rem;
 	overflow: hidden;
-	width: 200px;
+	width: 220px;
 	display: flex;
 	flex-direction: column;
 }
@@ -300,4 +272,25 @@ canvas {
 #chat > input {
 	font-family: "Inter", sans-serif;
 	font-size: 0.8rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .sidebar-container {
+    background: #222;
+    color: white;
+  }
+
+  #colors > input[type="radio"] {
+    border: none;
+  }
+
+  #chat,
+  #messages,
+  #chat > input {
+    color: black;
+  }
+
+  a {
+    color: #0092f3;
+  }
 }
