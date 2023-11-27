@@ -2,6 +2,10 @@ const authToken = document.cookie.split("token=").pop().split(";")[0];
 let url = window.location.href;
 
 if (authToken) {
+	if (url.includes("?token=")) {
+		window.location.href = url.split("?token=")[0];
+	}
+	
   fetch(url, {
     method: "POST",
     headers: {

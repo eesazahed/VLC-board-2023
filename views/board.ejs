@@ -3,7 +3,7 @@
     <title>VLC Board</title>
 
     <!-- Favicon -->
-    <link
+    <!-- <link
       rel="apple-touch-icon"
       sizes="180x180"
       href="favicon/apple-touch-icon.png"
@@ -13,7 +13,7 @@
       type="image/png"
       sizes="32x32"
       href="favicon/favicon-32x32.png"
-    />
+    /> -->
     <link
       rel="icon"
       type="image/png"
@@ -39,7 +39,57 @@
     />
 
     <!-- Load Libraries -->
-    <script src="js/login.js"></script>
+    <!-- <script src="js/login.js"></script> -->
+
+		<script>
+
+			const authToken = document.cookie.split("token=").pop().split(";")[0];
+			let url = window.location.href;
+
+			if (authToken) {
+				if (url.includes("?token=")) {
+					window.location.href = url.split("?token=")[0];
+				}
+
+				fetch(url, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						token: authToken,
+					}),
+				}).then((response) => {
+					if (response.status == 200) {
+						if (url.includes("?token=")) {
+							url = url.split("?token=")[0];
+						}
+
+						response.json().then((json) => {
+							generateCountdown(placeButton, json.cooldown);
+						});
+					} else {
+						response.text().then((text) => {
+							displayErrorMessage(text);
+						});
+					}
+				});
+			} else {
+				if (url.includes("?token=")) {
+					const queryString = url.split("?").pop();
+
+					const token = queryString.split("token=").pop();
+
+					if (token) {
+						document.cookie = `token=${token};max-age=31536000`;
+						console.log("logged in")
+						window.location.reload();
+					}
+				}
+			}
+
+			
+		</script>
 
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
@@ -47,11 +97,11 @@
   </head>
 
   <body>
-    <div class="sidebar">
+		<div class="sidebar">
       <div class="info">
-        <img class="logo" src="./img/board.png" alt="VLC Board" />
         <h1>VLC Board</h1>
       </div>
+      <div id="owner"><p><b><i>&nbsp;</i></b></p></div>
       <div id="chat-container">
         <p id="chatTitle"><b>Chat</b></p>
         <div id="chat">
@@ -69,13 +119,11 @@
           <p><a href="https://vlc.vercel.app/logintocanvas">Login</a></p>
         </div>
       </div>
-    </div>
 
+		</div>
     <div id="main">
       <div id="container">
         <p id="pixel"></p>
-        <p id="userPlacedElement"></p>
-
         <div id="zoom-container">
           <canvas
             height="<%- canvasHeight %>"
@@ -86,7 +134,7 @@
       </div>
 
       <div class="center">
-        <p id="placePixel" onclick="placePixel(event)">
+        <p id="placePixel" onclick="placePixel(event)" style="visibility: hidden;">
           <i class="fa-sharp fa-solid fa-check"></i>
         </p>
       </div>
@@ -108,6 +156,7 @@
     <script>
       if (authToken) {
         document.getElementById("loginlink").remove();
+				document.getElementById("placePixel").style.visibility = "visible";
         const colorElement = document.getElementById("colors");
         colorElement.innerHTML = "";
 
@@ -119,7 +168,7 @@
           };" color="${color}"></div>`;
         }
       } else {
-        document.getElementById("chat-container").remove();
+				document.getElementById("chat-container").remove();
       }
     </script>
   </body>

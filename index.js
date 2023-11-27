@@ -1,5 +1,5 @@
 const { exec } = require("child_process");
-
+ 
 // Load .env
 const dotenv = require("dotenv");
 dotenv.config();
@@ -246,7 +246,7 @@ io.on("connection", (socket) => {
       const msgContent = JSON.parse(msg);
 
       const token = msgContent.token;
-      const textContent = msgContent.textContent;
+      let textContent = msgContent.textContent;
 
       let username = null;
 
@@ -263,6 +263,10 @@ io.on("connection", (socket) => {
         return res.status(405).send(err);
       }
 
+			const swearWords = ["fuck", "shit", "ass", "bitch", "dick", "pussy", "nigger", "nigga"];
+
+		// todo: filter bad words
+			
       if (username && textContent.trim().length > 0) {
         io.emit("chat", JSON.stringify({ sender: username, textContent }));
       }

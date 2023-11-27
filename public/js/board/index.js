@@ -3,7 +3,7 @@ let selectedY;
 let pixelArray, interval;
 
 const coordElement = document.getElementById("pixel");
-const userPlacedElement = document.getElementById("userPlacedElement");
+const ownerElement = document.getElementById("owner");
 const placeButton = document.getElementById("placePixel");
 const chatInput = document.getElementById("chatInput");
 const messages = document.getElementById("messages");

@@ -130,12 +130,11 @@ function crosshairBorderRender(selectedNextX, selectedNextY) {
 
 function renderPixelOwner(pixel) {
   if (pixel == "open") {
-    userPlacedElement.innerHTML = "";
+    ownerElement.innerHTML = "<p>&nbsp;</p>";
     return;
   }
 
-  const displayInnerHTML = (username) =>
-    `<div style="padding: 0.5rem;">@${username}</div>`;
+  const displayInnerHTML = (username) => `<p>@${username}</p>`;
 
   let pixelOwner = pixel.u;
   if (!cachedUsers[pixelOwner]) {
@@ -150,15 +149,13 @@ function renderPixelOwner(pixel) {
     }).then((response) => {
       response.json().then((json) => {
         cachedUsers[pixelOwner] = json;
-        userPlacedElement.innerHTML = displayInnerHTML(
+        ownerElement.innerHTML = displayInnerHTML(
           cachedUsers[pixelOwner].username
         );
       });
     });
   } else {
-    userPlacedElement.innerHTML = displayInnerHTML(
-      cachedUsers[pixelOwner].username
-    );
+    ownerElement.innerHTML = displayInnerHTML(cachedUsers[pixelOwner].username);
   }
 }
 
